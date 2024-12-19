@@ -1,14 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
 # Function to detect OS
 detect_os() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo "macos"
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        echo "linux"
-    else
-        echo "unsupported"
-    fi
+    case "$OSTYPE" in
+        darwin*) echo "macos" ;;
+        linux-gnu*) echo "linux" ;;
+        *) echo "unsupported" ;;
+    esac
 }
 
 # Function to check if Ollama is already installed
@@ -40,11 +38,14 @@ install_macos() {
 
 # Function to get local IP address
 get_local_ip() {
-    if [[ "$(detect_os)" == "linux" ]]; then
-        ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d/ -f1 | head -n 1
-    else
-        ipconfig getifaddr en0 || ipconfig getifaddr en1
-    fi
+    case "$(detect_os)" in
+        linux)
+            ip addr show | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d/ -f1 | head -n 1
+            ;;
+        macos)
+            ipconfig getifaddr en0 || ipconfig getifaddr en1
+            ;;
+    esac
 }
 
 # Function to install and setup Open WebUI
@@ -75,10 +76,10 @@ main() {
         # Detect OS and install accordingly
         OS=$(detect_os)
         case $OS in
-            "linux")
+            linux)
                 install_linux
                 ;;
-            "macos")
+            macos)
                 install_macos
                 ;;
             *)
@@ -98,11 +99,14 @@ main() {
     
     # Start Ollama service
     echo "Starting Ollama service..."
-    if [[ "$(detect_os)" == "linux" ]]; then
-        sudo systemctl start ollama
-    else
-        ollama serve &
-    fi
+    case "$(detect_os)" in
+        linux)
+            sudo systemctl start ollama
+            ;;
+        macos)
+            ollama serve &
+            ;;
+    esac
     
     # Pull and run a test model
     echo "Pulling the default model (this may take a while)..."
