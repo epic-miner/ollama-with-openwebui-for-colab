@@ -6,7 +6,7 @@ This script automates the setup of Open WebUI, a user-friendly interface for int
 
 *   **Linux Operating System:** This script is designed for Linux-based systems.
 *   **Root Privileges:** The script requires root privileges to create users, manage directories, and install software.
-*   **`udocker` Installed:** Make sure `udocker` is installed on your system. You can install it using `pip install udocker`.
+*   **`udocker` Installed:** Make sure `udocker` is installed on your system. You can install it using `pip install udocker` (as described in the script).
 *   **`pip` Installed:** Python's package installer `pip` is required.
 
 ## Script Functionality
@@ -14,7 +14,7 @@ This script automates the setup of Open WebUI, a user-friendly interface for int
 The script performs the following actions:
 
 1.  **Installs Python dependencies:** Installs the python dependencies in the `requirements.txt` file.
-2.  **Installs Ollama:** Downloads and installs the Ollama server if it's not already present. **Note:** The script uses `curl -fsSL https://ollama.com/install.sh | sh` to install Ollama. While this is a convenient method, it is important to be aware of the security implications of piping the output of `curl` directly to `sh`. For enhanced security, consider downloading the Ollama binary directly from the [official Ollama website](https://ollama.com) and running it manually.
+2.  **Installs Ollama:** Downloads and installs the Ollama server if it's not already present.
 3.  **Starts Ollama Server:** Starts the Ollama server in the background and verifies that it's running.
 4.  **Creates a Dedicated User:** Creates a user named `udockeruser` to run the Open WebUI container, enhancing security.
 5.  **Sets up Directories:** Creates the necessary data directories for Open WebUI and sets the correct permissions.
@@ -23,22 +23,16 @@ The script performs the following actions:
 
 ## Usage
 
-### Google Colab
-
-1.  Open a new Google Colab notebook.
-2.  Copy and paste the content of the `setup_openwebui.sh` script into a code cell.
-3.  Run the code cell using `!bash ./setup_openwebui.sh`.
-4.  Once the script completes successfully, Open WebUI should be accessible in your web browser at:
+1.  **Save the Script:** Save the provided script to a file, for example, `setup_openwebui.sh`.
+2.  **Make the Script Executable:**
+    ```bash
+    chmod +x setup_openwebui.sh
     ```
-    http://localhost:3000
+3.  **Run the Script with Root Privileges:**
+    ```bash
+    sudo ./setup_openwebui.sh
     ```
-
-### Other Linux Systems
-
-1.  Save the provided script to a file, for example, `setup_openwebui.sh`.
-2.  Make the script executable: `chmod +x setup_openwebui.sh`.
-3.  Run the script with root privileges: `sudo ./setup_openwebui.sh`.
-4.  Once the script completes successfully, Open WebUI should be accessible in your web browser at:
+4.  **Access Open WebUI:** Once the script completes successfully, Open WebUI should be accessible in your web browser at:
     ```
     http://localhost:3000
     ```
@@ -72,15 +66,14 @@ The script uses several functions to organize its functionality:
 
 ## Troubleshooting
 
-*   **Ollama Installation Failure:** If the Ollama installation fails, check your internet connection and make sure the Ollama installation script is available. Consider downloading the Ollama binary directly instead.
+*   **Ollama Installation Failure:** If the Ollama installation fails, check your internet connection and make sure the Ollama installation script is available.
 *   **Ollama Server Not Reachable:** If the Ollama server fails to start, check the output of the script for error messages. You might need to increase the `sleep` time in the `start_ollama_serve` function or check if there are any conflicts with other programs using the same port.
 *   **Open WebUI Not Accessible:** If the Open WebUI is not accessible, check that the container is running correctly using `udocker ps -m -s`. Also, ensure that your firewall is not blocking access to port 3000.
-*   **Port Conflicts:** If you encounter errors related to port 3000 already being in use, you can modify the `HOST_PORT` variable in the script to use a different port.
+
+## Disclaimer
+
+This script is provided as-is and without warranty. Use it at your own risk. Always review the script before running it, especially when downloading and executing external scripts.
 
 ## Contributing
 
-Contributions are welcome! If you have any improvements or suggestions, feel free to submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+If you have any improvements or suggestions, feel free to contribute to this project.
