@@ -1,138 +1,79 @@
-# Open WebUI Manager
+# Open WebUI Setup Script with Ollama Integration
 
-A bash script for managing Open WebUI container using udocker. This script provides easy-to-use commands for setting up, running, backing up, and updating Open WebUI installations.
+This script automates the setup of Open WebUI, a user-friendly interface for interacting with language models, along with the installation and startup of Ollama, a local large language model server. It uses `udocker` to manage the Open WebUI container.
 
 ## Prerequisites
 
-- Root/sudo access
-- udocker installed on your system
-- Ollama running and accessible
+*   **Linux Operating System:** This script is designed for Linux-based systems.
+*   **Root Privileges:** The script requires root privileges to create users, manage directories, and install software.
+*   **`udocker` Installed:** Make sure `udocker` is installed on your system. You can install it using `pip install udocker` (as described in the script).
+*   **`pip` Installed:** Python's package installer `pip` is required.
 
-## Installation
+## Script Functionality
 
-1. Download the script:
-```bash
-curl -O https://raw.githubusercontent.com/yourrepo/webui-manager.sh
-```
+The script performs the following actions:
 
-2. Make it executable:
-```bash
-chmod +x webui-manager.sh
-```
-
-## Configuration
-
-The script uses the following default settings which can be modified in the script:
-
-- User: `udockeruser`
-- Data Directory: `/content/open-webui`
-- Container Name: `open-webui`
-- Host Port: `3000`
-- Container Port: `8080`
-- Image: `ghcr.io/open-webui/open-webui:main`
+1.  **Installs Python dependencies:** Installs the python dependencies in the `requirements.txt` file.
+2.  **Installs Ollama:** Downloads and installs the Ollama server if it's not already present.
+3.  **Starts Ollama Server:** Starts the Ollama server in the background and verifies that it's running.
+4.  **Creates a Dedicated User:** Creates a user named `udockeruser` to run the Open WebUI container, enhancing security.
+5.  **Sets up Directories:** Creates the necessary data directories for Open WebUI and sets the correct permissions.
+6.  **Pulls and Creates the Open WebUI Container:** Downloads the Open WebUI container image and creates a container using `udocker`.
+7.  **Starts the Open WebUI Container:** Runs the Open WebUI container with the necessary environment variables, volume mounts, and port mappings.
 
 ## Usage
 
-### Initial Setup
+1.  **Save the Script:** Save the provided script to a file, for example, `setup_openwebui.sh`.
+2.  **Make the Script Executable:**
+    ```bash
+    chmod +x setup_openwebui.sh
+    ```
+3.  **Run the Script with Root Privileges:**
+    ```bash
+    sudo ./setup_openwebui.sh
+    ```
+4.  **Access Open WebUI:** Once the script completes successfully, Open WebUI should be accessible in your web browser at:
+    ```
+    http://localhost:3000
+    ```
 
-To set up and start Open WebUI for the first time:
+## Script Details
 
-```bash
-sudo ./webui-manager.sh setup http://your-ollama-url:11434
-```
+### Constants
 
-This command will:
-- Create a dedicated user (udockeruser)
-- Set up necessary directories
-- Pull the Open WebUI container
-- Start the container
+The script uses the following constants, which you can modify to suit your needs:
 
-### Starting the Container
+*   `WEBUI_USER="udockeruser"`: The username for running the container.
+*   `DATA_DIR="/content/open-webui"`: The directory for storing Open WebUI data.
+*   `IMAGE_NAME="ghcr.io/open-webui/open-webui:main"`: The Open WebUI container image.
+*   `CONTAINER_NAME="open-webui"`: The name of the created container.
+*   `HOST_PORT="3000"`: The port on your host machine that will be mapped to the container port.
+*   `CONTAINER_PORT="8080"`: The port that the Open WebUI container listens on.
+*   `OLLAMA_URL="http://127.0.0.1:11434"`: The URL where the Ollama server is expected to be running.
 
-To start an existing container:
+### Functions
 
-```bash
-sudo ./webui-manager.sh start http://your-ollama-url:11434
-```
+The script uses several functions to organize its functionality:
 
-### Backup and Restore
-
-Create a backup:
-```bash
-sudo ./webui-manager.sh backup
-```
-Backups are saved as `webui-backup-YYYYMMDD-HHMMSS.tar.gz` in the current directory.
-
-Restore from a backup:
-```bash
-sudo ./webui-manager.sh restore webui-backup-20240319-123456.tar.gz
-```
-
-### Updating
-
-To update the container to the latest version:
-
-```bash
-sudo ./webui-manager.sh update
-```
-
-## Command Reference
-
-```bash
-./webui-manager.sh [command] [options]
-
-Commands:
-    setup <ollama_url>     - Initial setup and start (requires ollama_url)
-    start <ollama_url>     - Start existing container
-    backup                 - Create backup
-    restore <backup_file>  - Restore from backup
-    update                 - Update container
-    help                   - Show this help
-```
-
-## Directory Structure
-
-```
-/content/open-webui/
-└── data/               # Persistent data storage
-```
+*   `print_message`: Prints colored messages to the console.
+*   `check_root`: Checks if the script is run with root privileges.
+*   `install_ollama`: Installs the Ollama server.
+*   `start_ollama_serve`: Starts the Ollama server and verifies that it is reachable.
+*   `create_user`: Creates the user to run the container.
+*   `setup_directories`: Creates and configures the necessary directories.
+*   `setup_container`: Pulls the Open WebUI image and creates the container using `udocker`.
+*   `start_container`: Runs the Open WebUI container with the specified configurations.
 
 ## Troubleshooting
 
-### Common Issues
+*   **Ollama Installation Failure:** If the Ollama installation fails, check your internet connection and make sure the Ollama installation script is available.
+*   **Ollama Server Not Reachable:** If the Ollama server fails to start, check the output of the script for error messages. You might need to increase the `sleep` time in the `start_ollama_serve` function or check if there are any conflicts with other programs using the same port.
+*   **Open WebUI Not Accessible:** If the Open WebUI is not accessible, check that the container is running correctly using `udocker ps -m -s`. Also, ensure that your firewall is not blocking access to port 3000.
 
-1. **Permission Denied**
-   - Make sure you're running the script with sudo
-   - Check if udockeruser has correct permissions
+## Disclaimer
 
-2. **Container Won't Start**
-   - Verify Ollama URL is correct and accessible
-   - Check if port 3000 is available
-   - Ensure udocker is properly installed
-
-3. **Backup/Restore Fails**
-   - Check available disk space
-   - Verify backup file exists for restore
-   - Ensure write permissions in current directory
-
-### Logs
-
-To check container logs:
-```bash
-su - udockeruser -c "udocker logs open-webui"
-```
-
-## Security Considerations
-
-- The script creates a dedicated user (udockeruser) for running the container
-- All operations requiring elevated privileges need sudo
-- Data directory permissions are set to 755
-- Container runs as non-root user
+This script is provided as-is and without warranty. Use it at your own risk. Always review the script before running it, especially when downloading and executing external scripts.
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
-
-## License
-
-[Add your license information here]
+If you have any improvements or suggestions, feel free to contribute to this project.
