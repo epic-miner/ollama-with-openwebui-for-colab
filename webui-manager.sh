@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#install requirements
+pip install -r requirements.txt
+
 # Constants
 WEBUI_USER="udockeruser"
 DATA_DIR="/content/open-webui"
