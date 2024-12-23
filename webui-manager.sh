@@ -33,6 +33,34 @@ check_root() {
     fi
 }
 
+# Function to install ollama
+install_ollama() {
+    if command -v ollama &>/dev/null; then
+        print_message $YELLOW "Ollama is already installed."
+    else
+        print_message $GREEN "Installing Ollama..."
+        curl -fsSL https://ollama.com/install.sh | sh
+        if [ $? -ne 0 ]; then
+            print_message $RED "Ollama installation failed."
+            exit 1
+        fi
+        print_message $GREEN "Ollama installed successfully."
+    fi
+}
+
+# Function to start ollama serve
+start_ollama_serve() {
+  print_message $GREEN "Starting Ollama server..."
+  ollama serve &
+  sleep 5 # give some time for ollama server to start
+  if ! curl --output /dev/null --silent --head --fail "$OLLAMA_URL"; then
+    print_message $RED "Ollama server failed to start"
+    exit 1
+  else
+    print_message $GREEN "Ollama server started successfully"
+  fi
+}
+
 # Function to create user
 create_user() {
     if id "$WEBUI_USER" &>/dev/null; then
@@ -77,6 +105,8 @@ start_container() {
 
 print_message $GREEN "Starting Open WebUI setup..."
 check_root
+install_ollama
+start_ollama_serve
 create_user
 setup_directories
 setup_container
